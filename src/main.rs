@@ -2,8 +2,8 @@ use reqwest::Client;
 use serde::Deserialize;
 use std::error::Error;
 use std::fs;
-use std::io::Write;
 use chrono::{Local, Datelike, Timelike};
+mod file_handling;  // Import the module
 
 #[derive(Deserialize)]
 struct Config {
@@ -39,18 +39,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
         // 解析response
         let body = response.text().await?;
 
-        // 生成文件與組合路徑資訊
-        save_to_file(&file_path, &body)?;
+        file_handling::save_to_file(&file_path, &body)?;
         println!("Response body saved to {}", &file_path);
     } else {
         println!("Request failed with status code: {}", response.status());
     }
 
-    Ok(())
-}
-
-fn save_to_file(file_path: &str, content: &str) -> Result<(), Box<dyn Error>> {
-    let mut file = std::fs::File::create(file_path)?;
-    file.write_all(content.as_bytes())?;
     Ok(())
 }
