@@ -3,7 +3,10 @@ use serde::Deserialize;
 use std::error::Error;
 use std::fs;
 use chrono::{Local, Datelike, Timelike};
-mod file_handling;  // Import the module
+
+// Import the rust file
+mod file_handling;  
+mod mongo_connect;
 
 #[derive(Deserialize)]
 struct Config {
@@ -12,6 +15,11 @@ struct Config {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+
+    // Connect to MongoDB
+    let _client = mongo_connect::connect_to_mongodb().await?;
+    println!("Connected to MongoDB successfully!");
+
     // 讀取配置
     let config_content = fs::read_to_string("config.yaml")?;
     let config: Config = serde_yaml::from_str(&config_content)?;
