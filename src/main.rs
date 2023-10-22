@@ -4,17 +4,57 @@ use std::error::Error;
 use std::fs;
 use chrono::{Local, Datelike, Timelike};
 
+// actor web
+use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+
 // Import the rust file
 mod file_handling;  
 mod mongo_connect;
+
+
+#[get("/")]
+async fn hello() -> impl Responder {
+    HttpResponse::Ok().body("Hello world!")
+}
+
+#[post("/echo")]
+async fn echo(req_body: String) -> impl Responder {
+    HttpResponse::Ok().body(req_body)
+}
+
+async fn manual_hello() -> impl Responder {
+    HttpResponse::Ok().body("Hey there!")
+}
 
 #[derive(Deserialize)]
 struct Config {
     url: String,
 }
 
+#[actix_web::main]
+async fn server() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .service(hello)
+            .service(echo)
+            .route("/hey", web::get().to(manual_hello))
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+
+    // 啟動非同步
+    tokio::spawn(async {
+        // 啟動 Web 伺服器
+        let server_result = server();
+        if let Err(err) = server_result {
+            eprintln!("Server error: {:?}", err);
+        }
+    });
 
     // Connect to MongoDB
     let _client = mongo_connect::connect_to_mongodb().await?;
@@ -52,6 +92,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
     } else {
         println!("Request failed with status code: {}", response.status());
     }
+
+    // 阻塞主執行緒
+    // tokio::signal::ctrl_c().await.expect("Error waiting for Ctrl-C");
 
     Ok(())
 }
