@@ -12,6 +12,7 @@ tokio = {version = "1.32.0", features = ["full"]}
 serde = { version = "1.0.188", features = ["derive"] }
 serde_yaml = "0.8"
 actix-web = "4"
+actix-rt = "2.6"
 
 [dependencies.mongodb]
 version = "2.7.0"
