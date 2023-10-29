@@ -1,5 +1,6 @@
 use actix_web::{web, HttpResponse};
 
+// 路由一般操作
 pub fn chris_cfg_fn(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::resource("/test")
@@ -8,6 +9,7 @@ pub fn chris_cfg_fn(cfg: &mut web::ServiceConfig) {
     );
 }
 
+// 路由 MongoDB 資料庫操作
 pub fn mongo_cfg_fn(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::resource("/create")

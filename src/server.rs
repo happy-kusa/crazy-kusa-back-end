@@ -1,8 +1,12 @@
 use actix_web::{web, App, HttpResponse, HttpServer, Responder, Result};
 
 mod route;
-mod mongo_connect;
+mod mongo;
 
+const LISTEN_IP: &str = "127.0.0.1";
+const LISTEN_PORT: u16 = 8080;
+
+// Handler 根目錄
 async fn root_handler() -> impl Responder {
     HttpResponse::Ok().body("Hey there is root!")
 }
@@ -10,13 +14,13 @@ async fn root_handler() -> impl Responder {
 #[actix_web::main]
 pub async fn server_entry() -> Result<(), std::io::Error> {
 
-    // Connect to MongoDB
+    // 連線到 MongoDB
     println!("Waiting connect to MongoDB...");
-    let _client = mongo_connect::connect_to_mongodb().await;
-    println!("Connected to MongoDB successfully! _client = {:?}", _client);
+    let _client = mongo::connect_to_mongodb().await;
+    // println!("Connected to MongoDB successfully! _client = {:?}", _client);
 
-    // Start HTTP Server
-    println!("Start listening: 127.0.0.1:8080");
+    // 啟動 HTTP Server
+    println!("Start listening: {}:{}", LISTEN_IP, LISTEN_PORT);
     HttpServer::new(|| {
         App::new()
             .service(web::scope("/chris").configure(route::chris_cfg_fn))
@@ -26,7 +30,7 @@ pub async fn server_entry() -> Result<(), std::io::Error> {
                 web::get().to(root_handler),
             )
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((LISTEN_IP, LISTEN_PORT))?
     .run()
     .await?;
 
