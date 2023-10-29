@@ -5,7 +5,7 @@ use mongodb::{
 };
 use futures::stream::TryStreamExt;
 
-const MONGO_DB_LINK: &str = "mongodb+srv://chris:chris1234@chris-db.ec2i5ii.mongodb.net/?retryWrites=true&w=majority";
+const MONGO_DB_LINK: &str = "mongodb+srv://chris:chris1234@chris-db.ec2i5ii.mongodb.net";
 const MY_DATABASE: &str = "cocktail";
 const MY_COLLECTION: &str = "recipes";
 
@@ -27,18 +27,18 @@ pub async fn connect() -> mongodb::error::Result<Client> {
         .run_command(doc! {"ping": 1}, None)
         .await?;
 
-    let document = doc! {
-        "name": "Peter",
-        "job": "學長"
-    };
-    match create(&client, MY_DATABASE, MY_COLLECTION, document).await {
-        Ok(insert_result) => {
-            println!("Successfully insert:/n{:?}", insert_result);
-        }
-        Err(err) => {
-            eprintln!("Error inserting document: {:?}", err);
-        }
-    }
+    // let document = doc! {
+    //     "name": "Peter",
+    //     "job": "學長"
+    // };
+    // match create(&client, MY_DATABASE, MY_COLLECTION, document).await {
+    //     Ok(insert_result) => {
+    //         println!("Successfully insert:/n{:?}", insert_result);
+    //     }
+    //     Err(err) => {
+    //         eprintln!("Error inserting document: {:?}", err);
+    //     }
+    // }
 
     // 查找資料(指定 key 需要 _recipes)
     // let groceries_database = client.database(MY_DATABASE);
