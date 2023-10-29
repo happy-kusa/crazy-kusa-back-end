@@ -13,7 +13,10 @@ pub fn chris_cfg_fn(cfg: &mut web::ServiceConfig) {
 pub fn mongo_cfg_fn(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::resource("/create")
-            .route(web::post().to(|| async { HttpResponse::Ok().body("mongo create") }))
+            .route(web::post().to(|| async {
+                // 施工中
+                HttpResponse::Ok().body("mongo create")
+            }))
             .route(web::head().to(HttpResponse::MethodNotAllowed)),
     ).service(
         web::resource("/read")

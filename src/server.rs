@@ -16,7 +16,7 @@ pub async fn server_entry() -> Result<(), std::io::Error> {
 
     // 連線到 MongoDB
     println!("Waiting connect to MongoDB...");
-    let _client = mongo::connect_to_mongodb().await;
+    let _client = mongo::connect().await;
     // println!("Connected to MongoDB successfully! _client = {:?}", _client);
 
     // 啟動 HTTP Server
