@@ -1,7 +1,8 @@
+use crate::{error::Error::*, handler::BookRequest, Book, Result};
+use chrono::prelude::*;
+use futures::StreamExt;
 use mongodb::bson::{doc, document::Document, oid::ObjectId, Bson};
 use mongodb::{options::ClientOptions, Client, Collection};
-
-const MONGO_DB_LINK: &str = "mongodb+srv://chris:chris1234@chris-db.ec2i5ii.mongodb.net";
 
 const DB_NAME: &str = "booky";
 const COLL: &str = "books";
@@ -19,19 +20,10 @@ pub struct DB {
 }
 
 impl DB {
-    #[derive(Serialize, Deserialize, Debug)]
-    pub struct Book {
-        pub id: String,
-        pub name: String,
-        pub author: String,
-        pub num_pages: usize,
-        pub added_at: DateTime<Utc>,
-        pub tags: Vec<String>,
-    }
-
     pub async fn init() -> Result<Self> {
-        let mut client_options = ClientOptions::parse(MONGO_DB_LINK).await?;
+        let mut client_options = ClientOptions::parse("mongodb://127.0.0.1:27017").await?;
         client_options.app_name = Some("booky".to_string());
+
         Ok(Self {
             client: Client::with_options(client_options)?,
         })
@@ -49,6 +41,55 @@ impl DB {
             result.push(self.doc_to_book(&doc?)?);
         }
         Ok(result)
+    }
+
+    pub async fn create_book(&self, entry: &BookRequest) -> Result<()> {
+        let doc = doc! {
+            NAME: entry.name.clone(),
+            AUTHOR: entry.author.clone(),
+            NUM_PAGES: entry.num_pages as i32,
+            ADDED_AT: Utc::now(),
+            TAGS: entry.tags.clone(),
+        };
+
+        self.get_collection()
+            .insert_one(doc, None)
+            .await
+            .map_err(MongoQueryError)?;
+        Ok(())
+    }
+
+    pub async fn edit_book(&self, id: &str, entry: &BookRequest) -> Result<()> {
+        let oid = ObjectId::with_string(id).map_err(|_| InvalidIDError(id.to_owned()))?;
+        let query = doc! {
+            "_id": oid,
+        };
+        let doc = doc! {
+            NAME: entry.name.clone(),
+            AUTHOR: entry.author.clone(),
+            NUM_PAGES: entry.num_pages as i32,
+            ADDED_AT: Utc::now(),
+            TAGS: entry.tags.clone(),
+        };
+
+        self.get_collection()
+            .update_one(query, doc, None)
+            .await
+            .map_err(MongoQueryError)?;
+        Ok(())
+    }
+
+    pub async fn delete_book(&self, id: &str) -> Result<()> {
+        let oid = ObjectId::with_string(id).map_err(|_| InvalidIDError(id.to_owned()))?;
+        let filter = doc! {
+            "_id": oid,
+        };
+
+        self.get_collection()
+            .delete_one(filter, None)
+            .await
+            .map_err(MongoQueryError)?;
+        Ok(())
     }
 
     fn get_collection(&self) -> Collection {
@@ -80,4 +121,3 @@ impl DB {
         Ok(book)
     }
 }
-    
