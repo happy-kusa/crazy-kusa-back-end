@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct Idea {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<ObjectId>,
-    pub name: String,
-    pub location: String,
     pub title: String,
+    pub author: String,
+    pub content: String,
 }

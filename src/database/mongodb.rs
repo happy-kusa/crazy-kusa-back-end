@@ -34,9 +34,9 @@ impl MongoRepo {
     pub async fn create_user(&self, new_user: Idea) -> Result<InsertOneResult, Error> {
         let new_doc = Idea {
             id: None,
-            name: new_user.name,
-            location: new_user.location,
             title: new_user.title,
+            author: new_user.author,
+            content: new_user.content,
         };
         let user = self
             .col
@@ -68,9 +68,9 @@ impl MongoRepo {
             "$set":
                 {
                     "id": new_user.id,
-                    "name": new_user.name,
-                    "location": new_user.location,
-                    "title": new_user.title
+                    "title": new_user.title,
+                    "author": new_user.author,
+                    "content": new_user.content
                 },
         };
         let updated_doc = self

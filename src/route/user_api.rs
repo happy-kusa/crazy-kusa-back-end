@@ -10,9 +10,9 @@ use mongodb::bson::oid::ObjectId;
 pub async fn create_user(db: Data<MongoRepo>, new_user: Json<Idea>) -> HttpResponse {
     let data = Idea {
         id: None,
-        name: new_user.name.to_owned(),
-        location: new_user.location.to_owned(),
         title: new_user.title.to_owned(),
+        author: new_user.author.to_owned(),
+        content: new_user.content.to_owned(),
     };
 
     let user_detail = db.create_user(data).await;
@@ -49,9 +49,9 @@ pub async fn update_user(
     };
     let data = Idea {
         id: Some(ObjectId::parse_str(&id).unwrap()),
-        name: new_user.name.to_owned(),
-        location: new_user.location.to_owned(),
         title: new_user.title.to_owned(),
+        author: new_user.author.to_owned(),
+        content: new_user.content.to_owned(),
     };
 
     let update_result = db.update_user(&id, data).await;
@@ -95,10 +95,10 @@ pub async fn delete_user(db: Data<MongoRepo>, path: Path<String>) -> HttpRespons
 
 #[get("/blogs")]
 pub async fn get_all_users(db: Data<MongoRepo>) -> HttpResponse {
-    let users = db.get_all_users().await;
+    let ideas = db.get_all_users().await;
 
-    match users {
-        Ok(users) => HttpResponse::Ok().json(users),
+    match ideas {
+        Ok(ideas) => HttpResponse::Ok().json(ideas),
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }
