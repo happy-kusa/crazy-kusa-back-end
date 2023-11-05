@@ -1,25 +1,34 @@
-mod api;
+mod database;
 mod models;
-mod repository;
+mod route;
 
 use actix_web::{web::Data, App, HttpServer};
-use api::user_api::{create_user, delete_user, get_all_users, get_user, update_user};
-use repository::mongodb_repo::MongoRepo;
+use database::mongodb::MongoRepo;
+use route::user_api;
+
+const LISTEN_IP: &str = "127.0.0.1";
+const LISTEN_PORT: u16 = 8080;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    // 連線到 MongoDB
     let db = MongoRepo::init().await;
     let db_data = Data::new(db);
+
+    // 啟動 HTTP Server
+    println!("Start listening: {}:{}", LISTEN_IP, LISTEN_PORT);
     HttpServer::new(move || {
         App::new()
             .app_data(db_data.clone())
-            .service(create_user)
-            .service(get_user)
-            .service(update_user)
-            .service(delete_user)
-            .service(get_all_users)
+            .service(user_api::create_user)
+            .service(user_api::get_user)
+            .service(user_api::update_user)
+            .service(user_api::delete_user)
+            .service(user_api::get_all_users)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((LISTEN_IP, LISTEN_PORT))?
     .run()
-    .await
+    .await?;
+
+    Ok(())
 }
