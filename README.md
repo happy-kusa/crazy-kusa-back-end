@@ -4,7 +4,11 @@
 
 ### 資料庫
 
+```
 mongodb+srv://chris:chris1234@chris-db.ec2i5ii.mongodb.net/?retryWrites=true&w=majority
+```
+
+### 專案結構
 
 ### 路由
 
@@ -36,3 +40,5 @@ mongodb+srv://chris:chris1234@chris-db.ec2i5ii.mongodb.net/?retryWrites=true&w=m
 https://course.rs/practice/naming.html
 
 https://dev.to/hackmamba/build-a-rest-api-with-rust-and-mongodb-actix-web-version-ei1
+
+### 坑
