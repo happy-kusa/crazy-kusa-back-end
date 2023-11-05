@@ -7,12 +7,12 @@ use actix_web::{
 use mongodb::bson::oid::ObjectId;
 
 #[post("/blog")]
-pub async fn create_user(db: Data<MongoRepo>, new_user: Json<Idea>) -> HttpResponse {
+pub async fn create_user(db: Data<MongoRepo>, new_idea: Json<Idea>) -> HttpResponse {
     let data = Idea {
         id: None,
-        title: new_user.title.to_owned(),
-        author: new_user.author.to_owned(),
-        content: new_user.content.to_owned(),
+        title: new_idea.title.to_owned(),
+        author: new_idea.author.to_owned(),
+        content: new_idea.content.to_owned(),
     };
 
     let user_detail = db.create_user(data).await;
@@ -41,7 +41,7 @@ pub async fn get_user(db: Data<MongoRepo>, path: Path<String>) -> HttpResponse {
 pub async fn update_user(
     db: Data<MongoRepo>,
     path: Path<String>,
-    new_user: Json<Idea>,
+    new_idea: Json<Idea>,
 ) -> HttpResponse {
     let id = path.into_inner();
     if id.is_empty() {
@@ -49,9 +49,9 @@ pub async fn update_user(
     };
     let data = Idea {
         id: Some(ObjectId::parse_str(&id).unwrap()),
-        title: new_user.title.to_owned(),
-        author: new_user.author.to_owned(),
-        content: new_user.content.to_owned(),
+        title: new_idea.title.to_owned(),
+        author: new_idea.author.to_owned(),
+        content: new_idea.content.to_owned(),
     };
 
     let update_result = db.update_user(&id, data).await;

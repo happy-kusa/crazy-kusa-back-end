@@ -31,12 +31,12 @@ impl MongoRepo {
         MongoRepo { col }
     }
 
-    pub async fn create_user(&self, new_user: Idea) -> Result<InsertOneResult, Error> {
+    pub async fn create_user(&self, new_idea: Idea) -> Result<InsertOneResult, Error> {
         let new_doc = Idea {
             id: None,
-            title: new_user.title,
-            author: new_user.author,
-            content: new_user.content,
+            title: new_idea.title,
+            author: new_idea.author,
+            content: new_idea.content,
         };
         let user = self
             .col
@@ -61,16 +61,15 @@ impl MongoRepo {
         Ok(user_detail.unwrap())
     }
 
-    pub async fn update_user(&self, id: &String, new_user: Idea) -> Result<UpdateResult, Error> {
+    pub async fn update_user(&self, id: &String, new_idea: Idea) -> Result<UpdateResult, Error> {
         let obj_id = ObjectId::parse_str(id).unwrap();
         let filter = doc! {"_id": obj_id};
         let new_doc = doc! {
             "$set":
                 {
-                    "id": new_user.id,
-                    "title": new_user.title,
-                    "author": new_user.author,
-                    "content": new_user.content
+                    "title": new_idea.title,
+                    "author": new_idea.author,
+                    "content": new_idea.content
                 },
         };
         let updated_doc = self
