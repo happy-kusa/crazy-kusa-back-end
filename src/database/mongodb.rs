@@ -10,10 +10,10 @@ use mongodb::{
     Client, Collection,
 };
 
-use crate::models::user_model::User;
+use crate::models::user_model::Idea;
 
 pub struct MongoRepo {
-    col: Collection<User>,
+    col: Collection<Idea>,
 }
 
 impl MongoRepo {
@@ -26,13 +26,13 @@ impl MongoRepo {
         let client = Client::with_uri_str(uri)
             .await
             .expect("error connecting to database");
-        let db = client.database("rustDB");
-        let col: Collection<User> = db.collection("User");
+        let db = client.database("happyDB");
+        let col: Collection<Idea> = db.collection("myBlog");
         MongoRepo { col }
     }
 
-    pub async fn create_user(&self, new_user: User) -> Result<InsertOneResult, Error> {
-        let new_doc = User {
+    pub async fn create_user(&self, new_user: Idea) -> Result<InsertOneResult, Error> {
+        let new_doc = Idea {
             id: None,
             name: new_user.name,
             location: new_user.location,
@@ -48,7 +48,7 @@ impl MongoRepo {
         Ok(user)
     }
 
-    pub async fn get_user(&self, id: &String) -> Result<User, Error> {
+    pub async fn get_user(&self, id: &String) -> Result<Idea, Error> {
         let obj_id = ObjectId::parse_str(id).unwrap();
         let filter = doc! {"_id": obj_id};
         let user_detail = self
@@ -61,7 +61,7 @@ impl MongoRepo {
         Ok(user_detail.unwrap())
     }
 
-    pub async fn update_user(&self, id: &String, new_user: User) -> Result<UpdateResult, Error> {
+    pub async fn update_user(&self, id: &String, new_user: Idea) -> Result<UpdateResult, Error> {
         let obj_id = ObjectId::parse_str(id).unwrap();
         let filter = doc! {"_id": obj_id};
         let new_doc = doc! {
@@ -95,14 +95,14 @@ impl MongoRepo {
         Ok(user_detail)
     }
 
-    pub async fn get_all_users(&self) -> Result<Vec<User>, Error> {
+    pub async fn get_all_users(&self) -> Result<Vec<Idea>, Error> {
         let mut cursors = self
             .col
             .find(None, None)
             .await
             .ok()
             .expect("Error getting list of users");
-        let mut users: Vec<User> = Vec::new();
+        let mut users: Vec<Idea> = Vec::new();
         while let Some(user) = cursors
             .try_next()
             .await

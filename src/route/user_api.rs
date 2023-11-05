@@ -1,4 +1,4 @@
-use crate::{database::mongodb::MongoRepo, models::user_model::User};
+use crate::{database::mongodb::MongoRepo, models::user_model::Idea};
 use actix_web::{
     delete, get, post, put,
     web::{Data, Json, Path},
@@ -6,9 +6,9 @@ use actix_web::{
 };
 use mongodb::bson::oid::ObjectId;
 
-#[post("/user")]
-pub async fn create_user(db: Data<MongoRepo>, new_user: Json<User>) -> HttpResponse {
-    let data = User {
+#[post("/blog")]
+pub async fn create_user(db: Data<MongoRepo>, new_user: Json<Idea>) -> HttpResponse {
+    let data = Idea {
         id: None,
         name: new_user.name.to_owned(),
         location: new_user.location.to_owned(),
@@ -23,7 +23,7 @@ pub async fn create_user(db: Data<MongoRepo>, new_user: Json<User>) -> HttpRespo
     }
 }
 
-#[get("/user/{id}")]
+#[get("/blog/{id}")]
 pub async fn get_user(db: Data<MongoRepo>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
     if id.is_empty() {
@@ -37,17 +37,17 @@ pub async fn get_user(db: Data<MongoRepo>, path: Path<String>) -> HttpResponse {
     }
 }
 
-#[put("/user/{id}")]
+#[put("/blog/{id}")]
 pub async fn update_user(
     db: Data<MongoRepo>,
     path: Path<String>,
-    new_user: Json<User>,
+    new_user: Json<Idea>,
 ) -> HttpResponse {
     let id = path.into_inner();
     if id.is_empty() {
         return HttpResponse::BadRequest().body("invalid ID");
     };
-    let data = User {
+    let data = Idea {
         id: Some(ObjectId::parse_str(&id).unwrap()),
         name: new_user.name.to_owned(),
         location: new_user.location.to_owned(),
@@ -73,7 +73,7 @@ pub async fn update_user(
     }
 }
 
-#[delete("/user/{id}")]
+#[delete("/blog/{id}")]
 pub async fn delete_user(db: Data<MongoRepo>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
     if id.is_empty() {
@@ -84,16 +84,16 @@ pub async fn delete_user(db: Data<MongoRepo>, path: Path<String>) -> HttpRespons
     match result {
         Ok(res) => {
             if res.deleted_count == 1 {
-                return HttpResponse::Ok().json("User successfully deleted!");
+                return HttpResponse::Ok().json("Successfully deleted!");
             } else {
-                return HttpResponse::NotFound().json("User with specified ID not found!");
+                return HttpResponse::NotFound().json("Specified ID not found!");
             }
         }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }
 
-#[get("/users")]
+#[get("/blogs")]
 pub async fn get_all_users(db: Data<MongoRepo>) -> HttpResponse {
     let users = db.get_all_users().await;
 
