@@ -14,11 +14,11 @@ mongodb+srv://chris:chris1234@chris-db.ec2i5ii.mongodb.net/?retryWrites=true&w=m
 
 | 功能   | 方法   | 路徑                               | 作用   | 描述 |
 | ------ | ------ | ---------------------------------- | ------ | ---- |
-| 讀全部 | GET    | http://127.0.0.1:8080/blogs        | 資料庫 |      |
-| 建立   | POET   | http://127.0.0.1:8080/blog         | 資料庫 |      |
-| 讀取   | GET    | http://127.0.0.1:8080/blog/`<OID>` | 資料庫 |      |
-| 更新   | PUT    | http://127.0.0.1:8080/blog/`<OID>` | 資料庫 |      |
-| 刪除   | DELETE | http://127.0.0.1:8080/blog/`<OID>` | 資料庫 |      |
+| 讀全部 | GET    | http://127.0.0.1:8080/ideas        | 資料庫 |      |
+| 建立   | POET   | http://127.0.0.1:8080/idea         | 資料庫 |      |
+| 讀取   | GET    | http://127.0.0.1:8080/idea/`<OID>` | 資料庫 |      |
+| 更新   | PUT    | http://127.0.0.1:8080/idea/`<OID>` | 資料庫 |      |
+| 刪除   | DELETE | http://127.0.0.1:8080/idea/`<OID>` | 資料庫 |      |
 
 ### 執行
 

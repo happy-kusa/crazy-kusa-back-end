@@ -10,7 +10,7 @@ use mongodb::{
     Client, Collection,
 };
 
-use crate::models::user_model::Idea;
+use crate::models::idea_model::Idea;
 
 pub struct MongoRepo {
     col: Collection<Idea>,
@@ -27,41 +27,41 @@ impl MongoRepo {
             .await
             .expect("error connecting to database");
         let db = client.database("happyDB");
-        let col: Collection<Idea> = db.collection("myBlog");
+        let col: Collection<Idea> = db.collection("myIdea");
         MongoRepo { col }
     }
 
-    pub async fn create_user(&self, new_idea: Idea) -> Result<InsertOneResult, Error> {
+    pub async fn create_idea(&self, new_idea: Idea) -> Result<InsertOneResult, Error> {
         let new_doc = Idea {
             id: None,
             title: new_idea.title,
             author: new_idea.author,
             content: new_idea.content,
         };
-        let user = self
+        let idea = self
             .col
             .insert_one(new_doc, None)
             .await
             .ok()
-            .expect("Error creating user");
+            .expect("Error creating idea");
 
-        Ok(user)
+        Ok(idea)
     }
 
-    pub async fn get_user(&self, id: &String) -> Result<Idea, Error> {
+    pub async fn get_idea(&self, id: &String) -> Result<Idea, Error> {
         let obj_id = ObjectId::parse_str(id).unwrap();
         let filter = doc! {"_id": obj_id};
-        let user_detail = self
+        let idea_detail = self
             .col
             .find_one(filter, None)
             .await
             .ok()
-            .expect("Error getting user's detail");
+            .expect("Error getting idea's detail");
 
-        Ok(user_detail.unwrap())
+        Ok(idea_detail.unwrap())
     }
 
-    pub async fn update_user(&self, id: &String, new_idea: Idea) -> Result<UpdateResult, Error> {
+    pub async fn update_idea(&self, id: &String, new_idea: Idea) -> Result<UpdateResult, Error> {
         let obj_id = ObjectId::parse_str(id).unwrap();
         let filter = doc! {"_id": obj_id};
         let new_doc = doc! {
@@ -77,39 +77,39 @@ impl MongoRepo {
             .update_one(filter, new_doc, None)
             .await
             .ok()
-            .expect("Error updating user");
+            .expect("Error updating idea");
         Ok(updated_doc)
     }
 
-    pub async fn delete_user(&self, id: &String) -> Result<DeleteResult, Error> {
+    pub async fn delete_idea(&self, id: &String) -> Result<DeleteResult, Error> {
         let obj_id = ObjectId::parse_str(id).unwrap();
         let filter = doc! {"_id": obj_id};
-        let user_detail = self
+        let idea_detail = self
             .col
             .delete_one(filter, None)
             .await
             .ok()
-            .expect("Error deleting user");
+            .expect("Error deleting idea");
 
-        Ok(user_detail)
+        Ok(idea_detail)
     }
 
-    pub async fn get_all_users(&self) -> Result<Vec<Idea>, Error> {
+    pub async fn get_all_ideas(&self) -> Result<Vec<Idea>, Error> {
         let mut cursors = self
             .col
             .find(None, None)
             .await
             .ok()
-            .expect("Error getting list of users");
-        let mut users: Vec<Idea> = Vec::new();
-        while let Some(user) = cursors
+            .expect("Error getting list of ideas");
+        let mut ideas: Vec<Idea> = Vec::new();
+        while let Some(idea) = cursors
             .try_next()
             .await
             .ok()
             .expect("Error mapping through cursor")
         {
-            users.push(user)
+            ideas.push(idea)
         }
-        Ok(users)
+        Ok(ideas)
     }
 }

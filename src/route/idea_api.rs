@@ -1,4 +1,4 @@
-use crate::{database::mongodb::MongoRepo, models::user_model::Idea};
+use crate::{database::mongodb::MongoRepo, models::idea_model::Idea};
 use actix_web::{
     delete, get, post, put,
     web::{Data, Json, Path},
@@ -6,8 +6,8 @@ use actix_web::{
 };
 use mongodb::bson::oid::ObjectId;
 
-#[post("/blog")]
-pub async fn create_user(db: Data<MongoRepo>, new_idea: Json<Idea>) -> HttpResponse {
+#[post("/idea")]
+pub async fn create_idea(db: Data<MongoRepo>, new_idea: Json<Idea>) -> HttpResponse {
     let data = Idea {
         id: None,
         title: new_idea.title.to_owned(),
@@ -15,30 +15,30 @@ pub async fn create_user(db: Data<MongoRepo>, new_idea: Json<Idea>) -> HttpRespo
         content: new_idea.content.to_owned(),
     };
 
-    let user_detail = db.create_user(data).await;
+    let idea_detail = db.create_idea(data).await;
 
-    match user_detail {
-        Ok(user) => HttpResponse::Ok().json(user),
+    match idea_detail {
+        Ok(idea) => HttpResponse::Ok().json(idea),
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }
 
-#[get("/blog/{id}")]
-pub async fn get_user(db: Data<MongoRepo>, path: Path<String>) -> HttpResponse {
+#[get("/idea/{id}")]
+pub async fn get_idea(db: Data<MongoRepo>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
     if id.is_empty() {
         return HttpResponse::BadRequest().body("invalid ID");
     }
-    let user_detail = db.get_user(&id).await;
+    let idea_detail = db.get_idea(&id).await;
 
-    match user_detail {
-        Ok(user) => HttpResponse::Ok().json(user),
+    match idea_detail {
+        Ok(idea) => HttpResponse::Ok().json(idea),
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }
 
-#[put("/blog/{id}")]
-pub async fn update_user(
+#[put("/idea/{id}")]
+pub async fn update_idea(
     db: Data<MongoRepo>,
     path: Path<String>,
     new_idea: Json<Idea>,
@@ -54,32 +54,32 @@ pub async fn update_user(
         content: new_idea.content.to_owned(),
     };
 
-    let update_result = db.update_user(&id, data).await;
+    let update_result = db.update_idea(&id, data).await;
 
     match update_result {
         Ok(update) => {
             if update.matched_count == 1 {
-                let updated_user_info = db.get_user(&id).await;
+                let updated_idea_info = db.get_idea(&id).await;
 
-                return match updated_user_info {
-                    Ok(user) => HttpResponse::Ok().json(user),
+                return match updated_idea_info {
+                    Ok(idea) => HttpResponse::Ok().json(idea),
                     Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
                 };
             } else {
-                return HttpResponse::NotFound().body("No user found with specified ID");
+                return HttpResponse::NotFound().body("No idea found with specified ID");
             }
         }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
 }
 
-#[delete("/blog/{id}")]
-pub async fn delete_user(db: Data<MongoRepo>, path: Path<String>) -> HttpResponse {
+#[delete("/idea/{id}")]
+pub async fn delete_idea(db: Data<MongoRepo>, path: Path<String>) -> HttpResponse {
     let id = path.into_inner();
     if id.is_empty() {
         return HttpResponse::BadRequest().body("invalid ID");
     };
-    let result = db.delete_user(&id).await;
+    let result = db.delete_idea(&id).await;
 
     match result {
         Ok(res) => {
@@ -93,9 +93,9 @@ pub async fn delete_user(db: Data<MongoRepo>, path: Path<String>) -> HttpRespons
     }
 }
 
-#[get("/blogs")]
-pub async fn get_all_users(db: Data<MongoRepo>) -> HttpResponse {
-    let ideas = db.get_all_users().await;
+#[get("/ideas")]
+pub async fn get_all_ideas(db: Data<MongoRepo>) -> HttpResponse {
+    let ideas = db.get_all_ideas().await;
 
     match ideas {
         Ok(ideas) => HttpResponse::Ok().json(ideas),
